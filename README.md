@@ -1,4 +1,4 @@
-# 🛍️ E-commerce Backend (Amazon inspired API)
+# 🛍️ Ecommerce App Backend 
 
 A secure and scalable backend built with **Node.js**, **Express**, and **MongoDB (via mongoose)**. This API powers the Amazon inspired ecommerce frontend, with robust validation and integration-ready routes for product listing, cart, and user handling.
 

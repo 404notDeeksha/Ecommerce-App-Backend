@@ -1,5 +1,5 @@
 {
-  "name": "backend-app",
+  "name": "ecommerce-app-backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -11,6 +11,9 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "jest": {
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
