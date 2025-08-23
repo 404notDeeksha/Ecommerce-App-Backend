@@ -32,8 +32,16 @@ A secure and scalable backend built with **Node.js**, **Express**, and **MongoDB
 
 ## 🚀 Getting Started
 
-### 1. Clone the Repo
-
 ```bash
-git clone https://github.com/Deek1995/ecommerce-backend.git
-cd ecommerce-backend
+# 1. Clone the Repo
+git clone git@github.com:404notDeeksha/Ecommerce-App-Backend.git
+
+# 2. Navigate to the project folder
+cd Ecommerce-App-Backend
+
+# 3. Install dependencies
+npm install
+
+# 4. Start the dev server
+npm run dev
+```
