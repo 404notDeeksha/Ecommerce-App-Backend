@@ -22,10 +22,15 @@ const getAllProducts = async (req, res, next) => {
       };
     }
 
-    if (filters.minPrice || filters.maxPrice) {
+    if (
+      (filters.minPrice !== undefined && filters.minPrice !== "") ||
+      (filters.maxPrice !== undefined && filters.maxPrice !== "")
+    ) {
       query.Price = {
-        ...(filters.minPrice && { $gte: parseFloat(filters.minPrice) }),
-        ...(filters.maxPrice && { $lte: parseFloat(filters.maxPrice) }),
+        ...(filters.minPrice !== undefined &&
+          filters.minPrice !== "" && { $gte: parseFloat(filters.minPrice) }),
+        ...(filters.maxPrice !== undefined &&
+          filters.maxPrice !== "" && { $lte: parseFloat(filters.maxPrice) }),
       };
     }
 
