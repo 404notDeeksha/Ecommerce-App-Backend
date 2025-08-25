@@ -1,5 +1,5 @@
 # 🛍️ E-commerce Backend (Amazon inspired API)
-[![MIT License](https://img.shields.io/github/license/404notDeeksha/Ecommerce-App-Backend?style=flat-square)](https://github.com/404notDeeksha/Ecommerce-App-Backend/blob/main/LICENSE)
+[![MIT License](https://img.shields.io/github/license/404notDeeksha/Ecommerce-App-Backend?style=flat-square)](https://github.com/404notDeeksha/Ecommerce-App-Backend/blob/main/License)
 
 A Backend service with RESTful API integration for product listing, cart, and user handling.
 
