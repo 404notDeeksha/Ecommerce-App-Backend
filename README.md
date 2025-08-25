@@ -4,10 +4,13 @@ A secure and scalable backend built with **Node.js**, **Express**, and **MongoDB
 
 ---
 
-## 🔗 Live Frontend & GitHub Repos
+## 🔗 Live Demo
 
 - 🌐 **Live Site:** [ecommerce-app-techwithdeekksha.vercel.app](https://ecommerce-app-techwithdeekksha.vercel.app)
-- 💻 **Frontend GitHub:** [ecommerce-frontend](https://github.com/Deek1995/ecommerce-frontend)
+
+## Frontend Repositopry
+
+[![Ecommerce-App](https://img.shields.io/badge/Ecommerce--App-808080?style=for-the-badge&logo=github&logoColor=white)](https://github.com/404notDeeksha/Ecommerce-App)
 
 ---
 
