@@ -1,27 +1,21 @@
 # 🛍️ E-commerce Backend (Amazon inspired API)
 
-A secure and scalable backend built with **Node.js**, **Express**, and **MongoDB (via mongoose)**. This API powers the Amazon inspired ecommerce frontend, with robust validation and integration-ready routes for product listing, cart, and user handling.
-
----
+A Backend service with RESTful API integration for product listing, cart, and user handling.
 
 ## 🔗 Live Demo
 
 - 🌐 **Live Site:** [ecommerce-app-techwithdeekksha.vercel.app](https://ecommerce-app-techwithdeekksha.vercel.app)
 
-## Frontend Repositopry
+## Frontend Repository
 
 [![Ecommerce-App](https://img.shields.io/badge/Ecommerce--App-808080?style=for-the-badge&logo=github&logoColor=white)](https://github.com/404notDeeksha/Ecommerce-App)
-
----
 
 ## ⚙️ Tech Stack
 
 - **Backend:** Node.js, Express
-- **Database:** MongoDB
+- **Database:** MongoDB Atlas
 - **Hosting:** Vercel (serverless functions)
 - **Security:** dotenv, CORS
-
----
 
 ## ✨ Features
 
@@ -30,8 +24,6 @@ A secure and scalable backend built with **Node.js**, **Express**, and **MongoDB
 - 🧠 Scalable architecture with proper folder structure
 - 🌍 CORS setup for frontend-only access
 - ⚡️ Deployed via Vercel for serverless scaling
-
----
 
 ## 🚀 Getting Started
 
