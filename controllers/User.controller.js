@@ -2,31 +2,13 @@ const User = require("../models/User.model.js");
 const bcrypt = require("bcryptjs");
 
 // POST api/user/signup - create user account
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
 const signupUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
-    user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
-    await user.save();
-
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      data: {
-        id: user.userId,
-        name: user.name,
-        email: user.email,
-      },
-    });
-  } catch (err) {
-    res.status(404).json({
+  if (!name || !email || !password) {
+    return res.status(400).json({
       success: false,
-      data: err,
+      message: "All fields are required",
     });
   }
 
