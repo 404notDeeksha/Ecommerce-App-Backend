@@ -1,5 +1,5 @@
-import morgan from "morgan";
+const morgan = require("morgan");
 
 const requestLogger = morgan("dev");
 
-export default requestLogger;
+module.exports = requestLogger;
