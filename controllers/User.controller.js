@@ -12,6 +12,7 @@ const signupUser = asyncHandler(async (req, res) => {
     });
   }
 
+  const existingUser = await User.exists({ email });
   if (existingUser)
     return res
       .status(400)
