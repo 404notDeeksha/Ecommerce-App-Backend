@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 
 const router = require("./routes/index.routes");
 const env = require("./config/envValidator");
+const requestLogger = require("./middlewares/requestLogger");
 
 const app = express();
 
@@ -37,6 +38,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
+
+app.use(requestLogger);
 
 app.get("/api/test", (req, res) => {
   console.log("🔵 /api/test route hit!");
