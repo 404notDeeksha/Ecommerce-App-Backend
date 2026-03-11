@@ -1,12 +1,10 @@
 const express = require("express");
 require("dotenv").config();
-const dbConnection = require("./config/dbConnection");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+
 const router = require("./routes/index.routes");
 const env = require("./config/envValidator");
-
-dbConnection();
 
 const app = express();
 
@@ -46,11 +44,5 @@ app.get("/api/test", (req, res) => {
 });
 
 app.use("/api", router);
-
-const port = env.PORT;
-
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
 
 module.exports = app;
