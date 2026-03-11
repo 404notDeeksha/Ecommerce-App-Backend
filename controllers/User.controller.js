@@ -56,7 +56,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
       success: true,
       message: "User already registered. Go to sign-in page.",
       data: user,
-      // data: {
+      // data: {           update in frontend endpoint before removing comment
       //   id: user.userId,
       //   name: user.name,
       //   email: user.email,
