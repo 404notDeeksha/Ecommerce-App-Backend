@@ -7,6 +7,7 @@ const morgan = require("morgan");
 const router = require("./routes/index.routes");
 const env = require("./config/envValidator");
 const requestLogger = require("./middlewares/requestLogger");
+const helmet = require("helmet");
 
 const app = express();
 
@@ -35,13 +36,13 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.use(helmet());
+app.use(morgan("dev"));
+app.use(requestLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
-
-app.use(morgan("dev"));
-app.use(requestLogger);
 
 app.get("/api/test", (req, res) => {
   console.log("🔵 /api/test route hit!");
