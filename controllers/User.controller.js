@@ -1,5 +1,6 @@
 const User = require("../models/User.model.js");
 const bcrypt = require("bcryptjs");
+const asyncHandler = require("../utils/asyncHandler.js");
 
 // POST api/user/signup - create user account
 const signupUser = asyncHandler(async (req, res) => {
