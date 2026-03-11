@@ -39,82 +39,81 @@ const signupUser = asyncHandler(async (req, res) => {
 });
 
 // POST /api/user/emailAuth
-const verifyEmail = async (req, res) => {
-  try {
-    const { email } = req.body;
+const verifyEmail = asyncHandler(async (req, res) => {
+  const { email } = req.body;
 
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: "Email is required",
-      });
-    }
-
-    const user = await User.findOne({ email });
-
-    if (user) {
-      return res.status(200).json({
-        success: true,
-        message: "User already registered. Go to sign-in page.",
-        data: user,
-      });
-    }
-
-    return res.status(404).json({
+  if (!email) {
+    return res.status(400).json({
       success: false,
-      message: "User not registered. Please sign up.",
-    });
-  } catch (err) {
-    console.error("Error in verifyEmail:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: err.message,
+      message: "Email is required",
     });
   }
-};
+
+  const user = await User.findOne({ email });
+
+  if (user) {
+    return res.status(200).json({
+      success: true,
+      message: "User already registered. Go to sign-in page.",
+      data: user,
+      // data: {
+      //   id: user.userId,
+      //   name: user.name,
+      //   email: user.email,
+      // },
+    });
+  }
+
+  return res.status(404).json({
+    success: false,
+    message: "User not registered. Please sign up.",
+  });
+});
 
 // POST  api/user/passwordAuth
-const verifyPassword = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+const verifyPassword = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res
-        .status(404)
-        .json({ error: "Email not found. User not registered" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch)
-      return res
-        .status(400)
-        .json({ success: false, error: "Invalid credentials" });
-
-    res.status(201).json({
-      success: true,
-      message: "Login successful",
-      user: {
-        id: user.userId,
-        name: user.name,
-        email: user.email,
-      },
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Email and password are required",
     });
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Server Error" });
   }
-};
+
+    }
+  const user = await User.findOne({ email }).select("+password");
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "Email not found. User not registered",
+    });
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid credentials",
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Login successful",
+    data: {
+      id: user.userId,
+      name: user.name,
+      email: user.email,
+    },
+  });
+});
 
 // POST api/user/logout
 const logoutUser = (req, res) => {
-  try {
-    res.status(200).json({ success: true, message: "Logged out successfully" });
-  } catch (err) {
-    console.log(err);
-  }
+  res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
 module.exports = {
