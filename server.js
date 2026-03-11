@@ -3,6 +3,7 @@ require("dotenv").config();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
+const morgan = require("morgan");
 const router = require("./routes/index.routes");
 const env = require("./config/envValidator");
 const requestLogger = require("./middlewares/requestLogger");
@@ -39,6 +40,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
 
+app.use(morgan("dev"));
 app.use(requestLogger);
 
 app.get("/api/test", (req, res) => {
