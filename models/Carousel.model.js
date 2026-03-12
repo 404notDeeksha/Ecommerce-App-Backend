@@ -15,7 +15,8 @@ const carouselSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-  }
+  },
+  { timestamps: true }
 );
 
 const Carousel = mongoose.model("Carousel", carouselSchema);
