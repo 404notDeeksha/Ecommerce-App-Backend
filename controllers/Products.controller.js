@@ -27,7 +27,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     (filters.maxPrice !== undefined && filters.maxPrice !== "")
   ) {
     // query.price
-    // below code checks for undefined & Empty string values
+    // checks for undefined & Empty string values
     query.Price = {
       ...(filters.minPrice !== undefined &&
         filters.minPrice !== "" && { $gte: parseFloat(filters.minPrice) }),
