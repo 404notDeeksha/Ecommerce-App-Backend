@@ -2,7 +2,7 @@ const Products = require("../models/Products.model");
 const asyncHandler = require("../utils/asyncHandler");
 
 //   GET /api/products?filter
-const getAllProducts = async (req, res, next) => {
+const getAllProducts = asyncHandler(async (req, res) => {
   try {
     const filters = req.query;
 
@@ -53,10 +53,10 @@ const getAllProducts = async (req, res, next) => {
     console.error("Error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
-};
+});
 
 //  GET /api/products/product/:id
-const getSingleProduct = async (req, res, next) => {
+const getSingleProduct = asyncHandler(async (req, res) => {
   try {
     const product = await Products.findOne({ productId: req.params.id });
     if (!product)
@@ -67,7 +67,7 @@ const getSingleProduct = async (req, res, next) => {
   } catch (error) {
     console.log("Error fetching Product", error);
   }
-};
+});
 
 module.exports = {
   getAllProducts,
