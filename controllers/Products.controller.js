@@ -26,18 +26,14 @@ const getAllProducts = asyncHandler(async (req, res) => {
     (filters.minPrice !== undefined && filters.minPrice !== "") ||
     (filters.maxPrice !== undefined && filters.maxPrice !== "")
   ) {
-    query.price = {
-      ...(filters.minPrice && { $gte: Number(filters.minPrice) }),
-      ...(filters.maxPrice && { $lte: Number(filters.maxPrice) }),
+    // query.price
+    // below code checks for undefined & Empty string values
+    query.Price = {
+      ...(filters.minPrice !== undefined &&
+        filters.minPrice !== "" && { $gte: parseFloat(filters.minPrice) }),
+      ...(filters.maxPrice !== undefined &&
+        filters.maxPrice !== "" && { $lte: parseFloat(filters.maxPrice) }),
     };
-
-    // complex filter logic
-    // query.Price = {
-    //   ...(filters.minPrice !== undefined &&
-    //     filters.minPrice !== "" && { $gte: parseFloat(filters.minPrice) }),
-    //   ...(filters.maxPrice !== undefined &&
-    //     filters.maxPrice !== "" && { $lte: parseFloat(filters.maxPrice) }),
-    // };
   }
 
   if (filters.brand) {
@@ -46,7 +42,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
 
   const products = await Products.find(query).lean();
 
-  // check if removing below condition shall not break fe logic
+  // check if removing below condition shall not break FE logic
   if (!products || products.length === 0) {
     return res.status(200).json({
       success: false,
@@ -54,6 +50,11 @@ const getAllProducts = asyncHandler(async (req, res) => {
       data: [],
     });
   }
+
+  res.status(200).json({
+    success: true,
+    data: products,
+  });
 });
 
 //  GET /api/products/product/:id
@@ -64,6 +65,11 @@ const getSingleProduct = asyncHandler(async (req, res) => {
     return res
       .status(404)
       .json({ success: false, message: "Product Not Found!" });
+
+  res.status(200).json({
+    success: true,
+    data: product,
+  });
 });
 
 module.exports = {
