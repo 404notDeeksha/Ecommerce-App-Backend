@@ -58,6 +58,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
 
 //  GET /api/products/product/:id
 const getSingleProduct = asyncHandler(async (req, res) => {
+  const product = await Products.findOne({ productId: req.params.id }).lean();
 
   if (!product)
     return res
