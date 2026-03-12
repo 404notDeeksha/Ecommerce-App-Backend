@@ -22,17 +22,23 @@ const getAllProducts = asyncHandler(async (req, res) => {
     };
   }
 
-    if (
-      (filters.minPrice !== undefined && filters.minPrice !== "") ||
-      (filters.maxPrice !== undefined && filters.maxPrice !== "")
-    ) {
-      query.Price = {
-        ...(filters.minPrice !== undefined &&
-          filters.minPrice !== "" && { $gte: parseFloat(filters.minPrice) }),
-        ...(filters.maxPrice !== undefined &&
-          filters.maxPrice !== "" && { $lte: parseFloat(filters.maxPrice) }),
-      };
-    }
+  if (
+    (filters.minPrice !== undefined && filters.minPrice !== "") ||
+    (filters.maxPrice !== undefined && filters.maxPrice !== "")
+  ) {
+    query.price = {
+      ...(filters.minPrice && { $gte: Number(filters.minPrice) }),
+      ...(filters.maxPrice && { $lte: Number(filters.maxPrice) }),
+    };
+
+    // complex filter logic
+    // query.Price = {
+    //   ...(filters.minPrice !== undefined &&
+    //     filters.minPrice !== "" && { $gte: parseFloat(filters.minPrice) }),
+    //   ...(filters.maxPrice !== undefined &&
+    //     filters.maxPrice !== "" && { $lte: parseFloat(filters.maxPrice) }),
+    // };
+  }
 
   if (filters.brand) {
     query.brand = { $in: filters.brand.split(",") };
