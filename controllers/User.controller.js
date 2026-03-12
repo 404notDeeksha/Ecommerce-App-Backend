@@ -6,13 +6,6 @@ const asyncHandler = require("../utils/asyncHandler.js");
 const signupUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
-  if (!name || !email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: "All fields are required",
-    });
-  }
-
   const existingUser = await User.exists({ email });
   if (existingUser)
     return res
@@ -42,13 +35,6 @@ const signupUser = asyncHandler(async (req, res) => {
 const verifyEmail = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
-  if (!email) {
-    return res.status(400).json({
-      success: false,
-      message: "Email is required",
-    });
-  }
-
   const user = await User.findOne({ email });
 
   if (user) {
@@ -73,13 +59,6 @@ const verifyEmail = asyncHandler(async (req, res) => {
 // POST  api/user/passwordAuth
 const verifyPassword = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: "Email and password are required",
-    });
-  }
 
   const user = await User.findOne({ email }).select("+password");
 
