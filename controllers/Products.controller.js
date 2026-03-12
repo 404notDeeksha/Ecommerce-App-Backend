@@ -1,4 +1,5 @@
 const Products = require("../models/Products.model");
+const asyncHandler = require("../utils/asyncHandler");
 
 //   GET /api/products?filter
 const getAllProducts = async (req, res, next) => {
