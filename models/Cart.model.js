@@ -2,37 +2,40 @@ const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 
 // Define the schema for cart items
-const cartItemSchema = new mongoose.Schema({
-  productId: {
-    type: String,
-    required: true,
+const cartItemSchema = new mongoose.Schema(
+  {
+    productId: {
+      type: String,
+      required: true,
+    },
+    productName: {
+      type: String,
+      required: true,
+    },
+    productDescription: {
+      type: String,
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+    brand: {
+      type: String,
+    },
+    colour: {
+      type: String,
+    },
+    images: {
+      type: [String],
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
   },
-  productName: {
-    type: String,
-    required: true,
-  },
-  productDescription: {
-    type: String,
-  },
-  price: {
-    type: Number,
-    required: true,
-  },
-  brand: {
-    type: String,
-  },
-  colour: {
-    type: String,
-  },
-  images: {
-    type: [String],
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 1,
-  },
-});
+  { _id: false }
+);
 
 const cartSchema = new mongoose.Schema(
   {
