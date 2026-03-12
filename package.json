@@ -23,7 +23,8 @@
     "mongoose": "^8.9.1",
     "morgan": "^1.10.1",
     "nodemon": "^3.1.9",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.3",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
