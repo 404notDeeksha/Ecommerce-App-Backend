@@ -1,13 +1,9 @@
 const Carousel = require("../models/Carousel.model");
+const asyncHandler = require("../utils/asyncHandler");
 
-//  /api/carousel/featured
-const getCarousel = async (req, res) => {
-  try {
-    const carousel = await Carousel.find(); 
-    res.json({ success: true, data: carousel }); 
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message }); 
-  }
-};
+// GET /api/carousel/featured
+const getCarousel = asyncHandler(async (req, res) => {
+  res.status(200).json({ success: true, data: carousel });
+});
 
 module.exports = { getCarousel };
