@@ -128,6 +128,7 @@ Morgan request logging for API monitoring
 
 ## 📁 Project Structure
 
+```bash
 src
 │
 ├── controllers
@@ -150,6 +151,7 @@ src
 │   └── asyncHandler.js
 │
 └── server.js
+```
 
 ## 🚀 Getting Started
 
