@@ -1,24 +1,17 @@
-const User = require("../models/User.model.js");
-const bcrypt = require("bcryptjs");
+const userService = require("../services/user.service");
 const asyncHandler = require("../utils/asyncHandler.js");
 
-// POST api/user/signup - create user account
 const signupUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
-  const existingUser = await User.exists({ email });
-  if (existingUser)
+  const existingUser = await userService.checkUserExists(email);
+  if (existingUser) {
     return res
       .status(400)
       .json({ success: false, message: "User already exists" });
+  }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-  });
+  const user = await userService.createUser({ name, email, password });
 
   res.status(201).json({
     success: true,
@@ -31,11 +24,10 @@ const signupUser = asyncHandler(async (req, res) => {
   });
 });
 
-// POST /api/user/emailAuth
 const verifyEmail = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
-  const user = await User.findOne({ email });
+  const user = await userService.findUserByEmail(email);
 
   if (user) {
     return res.status(200).json({
@@ -54,11 +46,10 @@ const verifyEmail = asyncHandler(async (req, res) => {
   });
 });
 
-// POST  api/user/passwordAuth
 const verifyPassword = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).select("+password");
+  const user = await userService.findUserByEmailWithPassword(email);
 
   if (!user) {
     return res.status(404).json({
@@ -67,7 +58,7 @@ const verifyPassword = asyncHandler(async (req, res) => {
     });
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  const isMatch = await userService.verifyPassword(password, user.password);
 
   if (!isMatch) {
     return res.status(400).json({
@@ -87,7 +78,6 @@ const verifyPassword = asyncHandler(async (req, res) => {
   });
 });
 
-// POST api/user/logout
 const logoutUser = (req, res) => {
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
