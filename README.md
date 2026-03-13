@@ -29,6 +29,7 @@ The backend handles **user authentication, product listing, and cart management*
 
 The API follows a layered backend architecture separating responsibilities:
 
+```bash
  Client
    │
    ▼
@@ -45,9 +46,11 @@ Service Layer
    │
    ▼
 Database (MongoDB)
+```
 
 ## Middleware Flow
 
+```bash
 Request
    │
    ▼
@@ -70,61 +73,50 @@ Service Layer
    │
    ▼
 Central Error Handler
+```
 
 ## ✨ Features
 
-🛒 Cart Management
-
+### 🛒 Cart Management
 - Add products to cart
-- Update quantities
-- Remove products
+- Update item quantities
+- Remove products from cart
 
-👤 User Management
-
+### 👤 User Management
 - User registration
 - Email verification
 - Password authentication
 
-📦 Product API
-
+### 📦 Product API
 - Product listing
-- Product filtering
-- Product retrieval
+- Product filtering with query parameters
+- Retrieve single product details
 
-⚡ Production-Style Backend Design
-
-- Service layer separation
-- Centralized error handling
-- Async error wrapper
-- Structured request validation
+### ⚡ Production-Style Backend Design
+- Layered architecture with clear separation of concerns
+- Centralized error handling middleware
+- Async route wrapper for catching runtime errors
+- Structured request validation using Zod
 
 ## 🔐 Security & Reliability
 
 The API includes several backend best practices:
 
-- Security: 
+### 🔒 Security
+- **Helmet** for setting secure HTTP headers
+- **Restricted CORS origins** to allow requests only from trusted clients
+- **Environment variable protection** using `dotenv`
 
-Helmet for HTTP security headers
+### 🛡️ Request Safety
+- **Zod schema validation** for all incoming client inputs
+- **Sanitized API responses** to avoid exposing sensitive fields
 
-Restricted CORS origins
+### ⚠️ Error Handling
+- **Centralized error-handling middleware**
+- **Async route wrapper (`asyncHandler`)** to catch runtime errors in controllers
 
-Environment variable protection using dotenv
-
-- Request Safety
-
-Zod schema validation for all client inputs
-
-Sanitized API responses
-
-- Error Handling
-
-Centralized error middleware
-
-Async route wrapper to catch runtime errors
-
-- Logging
-
-Morgan request logging for API monitoring
+### 📜 Logging
+- **Morgan request logging** for API monitoring and debugging
 
 ## 📁 Project Structure
 
@@ -140,7 +132,6 @@ src
 ├── validations
 │
 ├── middlewares
-│
 │   ├── errorHandler.js
 │   ├── validateRequest.js
 │   └── requestLogger.js
