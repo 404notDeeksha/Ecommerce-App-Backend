@@ -41,15 +41,13 @@ const verifyEmail = asyncHandler(async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "User already registered. Go to sign-in page.",
-      data: user,
-      // data: {           update in frontend endpoint before removing comment
-      //   id: user.userId,
-      //   name: user.name,
-      //   email: user.email,
-      // },
+      data: {
+        id: user.userId,
+        name: user.name,
+        email: user.email,
+      },
     });
   }
-
   return res.status(404).json({
     success: false,
     message: "User not registered. Please sign up.",
