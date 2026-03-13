@@ -37,12 +37,6 @@ const addCartItems = asyncHandler(async (req, res) => {
 const updateCartQty = asyncHandler(async (req, res) => {
   const { userId, productId, quantity } = req.params;
 
-  if (!userId || !productId || quantity === undefined) {
-    return res.status(400).json({
-      error: "Missing required fields: userId, productId, or quantity.",
-    });
-  }
-
   const cart = await Cart.findOne({ userId });
 
   if (!cart) {
@@ -74,64 +68,50 @@ const updateCartQty = asyncHandler(async (req, res) => {
 const getCart = asyncHandler(async (req, res) => {
   const { userId } = req.params;
 
-  if (!userId) {
-    return res
-      .status(400)
-      .json({ success: false, message: "User ID is required" });
+  let cart = await Cart.findOne({ userId });
+
+  if (!cart) {
+    cart = await Cart.create({
+      userId,
+      items: [],
+      totalPrice: 0,
+    });
   }
 
-    let cart = await Cart.findOne({ userId });
-
-    if (!cart) {
-      cart = await Cart.create({
-        userId,
-        items: [],
-        totalPrice: 0,
-      });
-    }
-
-    res.status(200).json({ success: true, data: cart });
+  res.status(200).json({ success: true, data: cart });
 });
 
 const getCartQty = asyncHandler(async (req, res) => {
-    const { userId } = req.params; // Get user ID from request params
+  const { userId } = req.params;
 
-    if (!userId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User ID is required" });
-    }
+  const cart = await Cart.findOne({ userId });
 
-    const cart = await Cart.findOne({ userId });
+  const totalQuantity = cart
+    ? cart.items.reduce((acc, item) => acc + item.quantity, 0)
+    : 0;
 
-    const totalQuantity = cart
-      ? cart.items.reduce((acc, item) => acc + item.quantity, 0)
-      : 0;
-
-    res.status(200).json({ success: true, data: totalQuantity });
+  res.status(200).json({ success: true, data: totalQuantity });
 });
 
-//   DELETE/api/cart/:productId
+//   DELETE/api/cart/:userId/:productId
 const deleteCartItem = asyncHandler(async (req, res) => {
   const { userId, productId } = req.params;
 
-    const cart = await Cart.findOne({ userId });
+  const cart = await Cart.findOne({ userId });
 
-    if (!cart) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Cart not found" });
-    }
+  if (!cart) {
+    return res.status(404).json({ success: false, message: "Cart not found" });
+  }
 
-    cart.items = cart.items.filter((item) => item.productId !== productId);
+  cart.items = cart.items.filter((item) => item.productId !== productId);
 
-    await cart.save();
+  await cart.save();
 
-    res.status(200).json({
-      success: true,
-      message: "Item removed from cart",
-      data: cart,
-    });
+  res.status(200).json({
+    success: true,
+    message: "Item removed from cart",
+    data: cart,
+  });
 });
 
 module.exports = {
