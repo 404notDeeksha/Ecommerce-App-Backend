@@ -118,6 +118,69 @@ The API includes several backend best practices:
 ### 📜 Logging
 - **Morgan request logging** for API monitoring and debugging
 
+## Sample API Response
+
+```bash
+## 📡 Example API Response
+
+### Create User
+
+POST /api/user/signup
+
+Request:
+
+{
+  "name": "Deeksha",
+  "email": "deeksha@email.com",
+  "password": "securePassword"
+}
+
+Response:
+
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "id": "user_uuid",
+    "name": "Deeksha",
+    "email": "deeksha@email.com"}
+}
+
+### Add Item to Cart
+
+POST /api/cart
+
+**Request**
+
+```json
+{
+  "userId": "user_123",
+  "items": [
+    {
+      "productId": "123",
+      "quantity": 1
+    }
+  ]
+}
+
+**Response**
+
+{
+  "success": true,
+  "message": "Items added to cart successfully",
+  "data": {
+    "userId": "user_123",
+    "items": [
+      {
+        "productId": "123",
+        "quantity": 1
+      }
+    ]
+  }
+}
+
+```
+
 ## 📁 Project Structure
 
 ```bash
