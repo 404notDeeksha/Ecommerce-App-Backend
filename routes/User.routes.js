@@ -24,4 +24,5 @@ userRouter
   .route("/passwordAuth")
   .post(validateRequest(passwordAuthSchema), verifyPassword);
 userRouter.route("/logout").post(logoutUser);
+
 module.exports = userRouter;
