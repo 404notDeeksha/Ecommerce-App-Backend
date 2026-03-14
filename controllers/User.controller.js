@@ -26,6 +26,7 @@ const signupUser = asyncHandler(async (req, res) => {
 
 const verifyEmail = asyncHandler(async (req, res) => {
   const { email } = req.body;
+  console.log("Email input", email);
 
   const user = await userService.findUserByEmail(email);
 
