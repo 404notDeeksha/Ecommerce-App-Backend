@@ -6,19 +6,21 @@ const env = require("./config/envValidator");
 
 const port = env.PORT;
 
-async function startServer() {
-  try {
-    await dbConnection();
+// async function startServer() {
+//   try {
+//     await
+dbConnection();
 
-    if (process.env.NODE_ENV !== "production") {
-      app.listen(port, () => {
-        console.log(`Server running on ${port}`);
-      });
-    }
-  } catch (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
-  }
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => {
+    console.log(`Server running on ${port}`);
+  });
 }
+//   } catch (error) {
+//     console.error("Failed to start server:", error);
+//     process.exit(1);
+//   }
+// }
 
-startServer();
+// startServer();
+module.exports = app;
