@@ -38,7 +38,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(helmet());
-app.use(morgan("dev"));
 app.use(requestLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
