@@ -45,10 +45,10 @@ const buildProductQuery = (filters) => {
 };
 
 const buildSortOption = (sortBy, sortOrder) => {
-  if (!sortBy) return {};
-  
+  if (!sortBy) return { rating: -1 };
+
   const sortDir = sortOrder === "desc" ? -1 : 1;
-  
+
   switch (sortBy) {
     case "price":
       return { price: sortDir };
@@ -69,15 +69,11 @@ const getAllProducts = async (filters) => {
   const page = Math.max(parseInt(filters.page) || 1, 1);
   const limit = Math.min(parseInt(filters.limit) || 20, 100);
   const skip = (page - 1) * limit;
-  
+
   const sort = buildSortOption(filters.sortBy, filters.sortOrder);
-  
+
   const [products, total] = await Promise.all([
-    Products.find(query)
-      .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .lean(),
+    Products.find(query).sort(sort).skip(skip).limit(limit).lean(),
     Products.countDocuments(query),
   ]);
 
