@@ -37,6 +37,23 @@ const buildProductQuery = (filters) => {
   return query;
 };
 
+const buildSortOption = (sortBy, sortOrder) => {
+  if (!sortBy) return {};
+  
+  const sortDir = sortOrder === "desc" ? -1 : 1;
+  
+  switch (sortBy) {
+    case "price":
+      return { price: sortDir };
+    case "name":
+      return { productName: sortDir };
+    case "rating":
+      return { rating: sortDir };
+    default:
+      return {};
+  }
+};
+
 const getAllProducts = async (filters) => {
   const query = buildProductQuery(filters);
   
@@ -44,9 +61,11 @@ const getAllProducts = async (filters) => {
   const limit = parseInt(filters.limit) || 20;
   const skip = (page - 1) * limit;
   
+  const sort = buildSortOption(filters.sortBy, filters.sortOrder);
   
   const [products, total] = await Promise.all([
     Products.find(query)
+      .sort(sort)
       .skip(skip)
       .limit(limit)
       .lean(),

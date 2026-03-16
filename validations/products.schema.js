@@ -30,6 +30,8 @@ const getAllProductsSchema = z.object({
       .or(z.number())
       .transform((val) => (val === "" ? undefined : Number(val)))
       .optional(),
+    sortBy: z.enum(["price", "name", "rating"]).optional(),
+    sortOrder: z.enum(["asc", "desc"]).optional(),
   }).optional(),
 });
 
