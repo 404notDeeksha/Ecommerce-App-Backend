@@ -22,16 +22,19 @@ const buildProductQuery = (filters) => {
     };
   }
 
-  if (
-    (filters.minPrice !== undefined && filters.minPrice !== "") ||
-    (filters.maxPrice !== undefined && filters.maxPrice !== "")
-  ) {
-    query.price = {
-      ...(filters.minPrice !== undefined &&
-        filters.minPrice !== "" && { $gte: parseFloat(filters.minPrice) }),
-      ...(filters.maxPrice !== undefined &&
-        filters.maxPrice !== "" && { $lte: parseFloat(filters.maxPrice) }),
-    };
+  const minPrice = parseFloat(filters.minPrice);
+  const maxPrice = parseFloat(filters.maxPrice);
+
+  if (!isNaN(minPrice) || !isNaN(maxPrice)) {
+    query.price = {};
+
+    if (!isNaN(minPrice)) {
+      query.price.$gte = minPrice;
+    }
+
+    if (!isNaN(maxPrice)) {
+      query.price.$lte = maxPrice;
+    }
   }
 
   if (filters.brand) {
