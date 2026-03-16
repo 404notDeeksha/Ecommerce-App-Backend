@@ -60,9 +60,11 @@ const buildSortOption = (sortBy, sortOrder) => {
 
 const getAllProducts = async (filters) => {
   const query = buildProductQuery(filters);
-  
-  const page = parseInt(filters.page) || 1;
-  const limit = parseInt(filters.limit) || 20;
+
+  // page cannot be < 1
+  // limit cannot exceed 100
+  const page = Math.max(parseInt(filters.page) || 1, 1);
+  const limit = Math.min(parseInt(filters.limit) || 20, 100);
   const skip = (page - 1) * limit;
   
   const sort = buildSortOption(filters.sortBy, filters.sortOrder);
