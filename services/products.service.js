@@ -3,6 +3,10 @@ const Products = require("../models/Products.model");
 const buildProductQuery = (filters) => {
   const query = {};
 
+  if (filters.search) {
+    query.$text = { $search: filters.search };
+  }
+
   if (filters.category) {
     query.category = filters.category;
   }

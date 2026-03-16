@@ -2,6 +2,7 @@ const { z } = require("zod");
 
 const getAllProductsSchema = z.object({
   query: z.object({
+    search: z.string().optional(),
     category: z.string().optional(),
     subCategory: z.string().optional(),
     discount: z
