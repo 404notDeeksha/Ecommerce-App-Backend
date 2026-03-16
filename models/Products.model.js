@@ -42,6 +42,14 @@ productSchema.index({
   subCategory: "text",
 });
 
+// indexes for filtering & sorting performance
+productSchema.index({ category: 1 });
+productSchema.index({ subCategory: 1 });
+productSchema.index({ brand: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ rating: -1 });
+productSchema.index({ discount: -1 });
+
 const Product = mongoose.model("Product", productSchema);
 
 module.exports = Product;
