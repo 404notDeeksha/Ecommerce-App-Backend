@@ -8,28 +8,31 @@ const itemSchema = new mongoose.Schema({
   stockAvailability: { type: Boolean, required: true },
 });
 
-const productSchema = new mongoose.Schema({
-  productId: { type: String, required: true, unique: true },
-  productName: { type: String, required: true },
-  productDescription: { type: String, required: true, maxlength: 100 },
-  price: { type: Number, required: true },
-  brand: { type: String, required: true },
-  modelName: { type: String, required: true },
-  colour: { type: String, required: true },
-  itemDimensions: { type: String, required: true },
-  images: [{ type: String, required: true }],
-  weight: { type: String, required: true },
-  material: { type: String, required: true },
-  warranty: { type: String, required: true },
-  stockAvailability: { type: Boolean, required: true },
-  rating: { type: Number, required: true },
-  aboutThisItem: [{ type: String, required: true }],
-  discount: { type: Number, required: true },
-  category: { type: String, required: true },
-  subCategory: { type: String, required: true },
-  bestseller: { type: Boolean, required: true },
-  items: [itemSchema],
-});
+const productSchema = new mongoose.Schema(
+  {
+    productId: { type: String, required: true, unique: true },
+    productName: { type: String, required: true },
+    productDescription: { type: String, required: true, maxlength: 100 },
+    price: { type: Number, required: true },
+    brand: { type: String, required: true },
+    modelName: { type: String, required: true },
+    colour: { type: String, required: true },
+    itemDimensions: { type: String, required: true },
+    images: [{ type: String, required: true }],
+    weight: { type: String, required: true },
+    material: { type: String, required: true },
+    warranty: { type: String, required: true },
+    stockAvailability: { type: Boolean, required: true },
+    rating: { type: Number, required: true },
+    aboutThisItem: [{ type: String, required: true }],
+    discount: { type: Number, required: true },
+    category: { type: String, required: true },
+    subCategory: { type: String, required: true },
+    bestseller: { type: Boolean, required: true },
+    items: [itemSchema],
+  },
+  { timestamps: true }
+);
 
 productSchema.index({
   productName: "text",
