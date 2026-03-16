@@ -20,6 +20,16 @@ const getAllProductsSchema = z.object({
       .transform((val) => (val === "" ? undefined : Number(val)))
       .optional(),
     brand: z.string().optional(),
+    page: z
+      .string()
+      .or(z.number())
+      .transform((val) => (val === "" ? undefined : Number(val)))
+      .optional(),
+    limit: z
+      .string()
+      .or(z.number())
+      .transform((val) => (val === "" ? undefined : Number(val)))
+      .optional(),
   }).optional(),
 });
 

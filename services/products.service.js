@@ -39,7 +39,29 @@ const buildProductQuery = (filters) => {
 
 const getAllProducts = async (filters) => {
   const query = buildProductQuery(filters);
-  return await Products.find(query).lean();
+  
+  const page = parseInt(filters.page) || 1;
+  const limit = parseInt(filters.limit) || 20;
+  const skip = (page - 1) * limit;
+  
+  
+  const [products, total] = await Promise.all([
+    Products.find(query)
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Products.countDocuments(query),
+  ]);
+
+  return {
+    data: products,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 const getProductById = async (productId) => {

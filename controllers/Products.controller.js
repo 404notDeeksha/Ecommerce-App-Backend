@@ -4,19 +4,25 @@ const asyncHandler = require("../utils/asyncHandler");
 const getAllProducts = asyncHandler(async (req, res) => {
   const filters = req.query;
 
-  const products = await productService.getAllProducts(filters);
+  const result = await productService.getAllProducts(filters);
 
-  if (!products || products.length === 0) {
+  if (!result.data || result.data.length === 0) {
     return res.status(200).json({
-      success: false,
-      message: "No products found matching the filters.",
+      success: true,
       data: [],
+      pagination: {
+        total: 0,
+        page: parseInt(filters.page) || 1,
+        limit: parseInt(filters.limit) || 20,
+        totalPages: 0,
+      },
     });
   }
 
   res.status(200).json({
     success: true,
-    data: products,
+    data: result.data,
+    pagination: result.pagination,
   });
 });
 
