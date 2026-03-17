@@ -1,5 +1,4 @@
 const userService = require("../services/user.service");
-const authService = require("../services/auth.service");
 const asyncHandler = require("../utils/asyncHandler.js");
 
 const signupUser = asyncHandler(async (req, res) => {
@@ -14,12 +13,6 @@ const signupUser = asyncHandler(async (req, res) => {
 
   const user = await userService.createUser({ name, email, password });
 
-  const { accessToken, refreshToken } = authService.generateTokens(
-    user.userId,
-    user.role
-  );
-  await authService.storeRefreshToken(user.userId, refreshToken);
-
   res.status(201).json({
     success: true,
     message: "User registered successfully",
@@ -27,10 +20,7 @@ const signupUser = asyncHandler(async (req, res) => {
       id: user.userId,
       name: user.name,
       email: user.email,
-      role: user.role,
     },
-    accessToken,
-    refreshToken,
   });
 });
 
@@ -78,12 +68,6 @@ const verifyPassword = asyncHandler(async (req, res) => {
     });
   }
 
-  const { accessToken, refreshToken } = authService.generateTokens(
-    user.userId,
-    user.role
-  );
-  await authService.storeRefreshToken(user.userId, refreshToken);
-
   res.status(200).json({
     success: true,
     message: "Login successful",
@@ -91,27 +75,13 @@ const verifyPassword = asyncHandler(async (req, res) => {
       id: user.userId,
       name: user.name,
       email: user.email,
-      role: user.role,
     },
-    accessToken,
-    refreshToken,
   });
 });
 
-const logoutUser = asyncHandler(async (req, res) => {
-  const { refreshToken } = req.body;
-  
-  if (refreshToken) {
-    try {
-      const decoded = authService.verifyRefreshToken(refreshToken);
-      await authService.removeRefreshToken(decoded.userId, refreshToken);
-    } catch (error) {
-      console.log("Error removing refresh token:", error.message);
-    }
-  }
-
+const logoutUser = (req, res) => {
   res.status(200).json({ success: true, message: "Logged out successfully" });
-});
+};
 
 module.exports = {
   signupUser,

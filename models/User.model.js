@@ -26,15 +26,6 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
       select: false,
     },
-    role: {
-      type: String,
-      enum: ["user", "admin"],
-      default: "user",
-    },
-    refreshTokens: [{
-      token: String,
-      expiresAt: Date,
-    }],
   },
   {
     timestamps: true,

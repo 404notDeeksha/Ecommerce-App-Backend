@@ -8,7 +8,6 @@ const env = require("./config/envValidator");
 const requestLogger = require("./middlewares/requestLogger");
 const helmet = require("helmet");
 const errorHandler = require("./middlewares/errorHandler");
-const { apiLimiter } = require("./config/rateLimit");
 
 const app = express();
 
@@ -32,8 +31,7 @@ const corsOptions = {
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  exposedHeaders: ["Authorization"],
-  credentials: true,
+  credentials: true, //
 };
 
 app.use(cors(corsOptions));
@@ -44,8 +42,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(cookieParser());
-
-app.use("/api", apiLimiter);
 
 app.get("/api/test", (req, res) => {
   console.log("🔵 /api/test route hit!");
