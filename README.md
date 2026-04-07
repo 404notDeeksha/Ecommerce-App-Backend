@@ -39,11 +39,33 @@
 
 | Route | Methods |
 |-------|---------|
-| `/api/user` | POST signup, login, logout, email check |
-| `/api/products` | GET list (10+ filters), get by ID |
-| `/api/cart` | POST, GET, PUT, DELETE |
+| `/api/user` | POST signup, emailAuth, passwordAuth, logout |
+| `/api/products` | GET list, GET by ID |
+| `/api/cart` | POST, GET, PUT, DELETE, GET quantity |
 | `/api/auth` | POST refresh-token |
 | `/api/carousel` | GET featured |
+
+### Products Filters
+| Filter | Query Param | Example |
+|--------|-------------|----------|
+| Text search | `search` | `?search=phone` |
+| Category | `category` | `?category=Electronics` |
+| Subcategory | `subCategory` | `?subCategory=Mobiles` |
+| Price range | `minPrice`, `maxPrice` | `?minPrice=100&maxPrice=500` |
+| Brand | `brand` | `?brand=Apple,Samsung` |
+| Discount | `discount` | `?discount=50` (max %) |
+| Rating | `rating` | `?rating=4` (min stars) |
+| Sort | `sortBy`, `sortOrder` | `?sortBy=price&sortOrder=asc` |
+| Pagination | `page`, `limit` | `?page=2&limit=20` |
+
+### Cart Endpoints
+| Method | Endpoint | Description |
+|--------|----------|--------------|
+| POST | `/api/cart` | Add items to cart |
+| GET | `/api/cart/:userId` | Get user's cart |
+| GET | `/api/cart/quantity/:userId` | Get cart item count |
+| PUT | `/api/cart/:userId/:productId/:quantity` | Update item qty |
+| DELETE | `/api/cart/:userId/:productId` | Remove item |
 
 ---
 
@@ -53,6 +75,7 @@
 - **Auto-Priced Carts** — `pre("save")` middleware keeps totals consistent without manual updates
 - **Fail-Fast Config** — Missing env vars crash at startup, not at runtime
 - **Password Safety** — `select: false` by default; explicit fetch only where needed
+- **Layered Rate Limiting** — Global (100/15min) + Auth (5/15min) + Password brute-force (3/15min)
 
 ---
 
