@@ -9,6 +9,7 @@ const {
 } = require("../controllers/User.controller");
 
 const validateRequest = require("../middlewares/validateRequest");
+const { authLimiter, passwordAttemptLimiter } = require("../config/rateLimit");
 
 const {
   signupSchema,
@@ -16,13 +17,11 @@ const {
   passwordAuthSchema,
 } = require("../validations/user.schema");
 
-userRouter.route("/signup").post(validateRequest(signupSchema), signupUser);
-userRouter
-  .route("/emailAuth")
-  .post(validateRequest(emailAuthSchema), verifyEmail);
+userRouter.route("/signup").post(authLimiter, validateRequest(signupSchema), signupUser);
+userRouter.route("/emailAuth").post(authLimiter, validateRequest(emailAuthSchema), verifyEmail);
 userRouter
   .route("/passwordAuth")
-  .post(validateRequest(passwordAuthSchema), verifyPassword);
+  .post(passwordAttemptLimiter, validateRequest(passwordAuthSchema), verifyPassword);
 userRouter.route("/logout").post(logoutUser);
 
 module.exports = userRouter;

@@ -23,6 +23,17 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const passwordAttemptLimiter = rateLimit({
+  windowMs: env.RATE_LIMIT_WINDOW_MS,
+  max: 3,
+  message: {
+    success: false,
+    message: "Too many password attempts, please try again later.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const refreshTokenLimiter = rateLimit({
   windowMs: env.RATE_LIMIT_WINDOW_MS,
   max: 30,
@@ -38,4 +49,5 @@ module.exports = {
   apiLimiter,
   authLimiter,
   refreshTokenLimiter,
+  passwordAttemptLimiter,
 };
