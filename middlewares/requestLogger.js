@@ -4,12 +4,19 @@ const path = require("path");
 
 let requestLogger;
 
+const format = (tokens, req, res) => {
+  return `${tokens.method(req, res)} ${tokens.url(req, res)} | ${tokens.status(
+    req,
+    res
+  )} | ${tokens["response-time"](req, res)} ms`;
+};
+
 if (process.env.NODE_ENV === "production") {
   // In production, log to console (platform captures logs)
-  requestLogger = morgan("combined", {
-    skip: (req, res) => res.statusCode < 400,
+  requestLogger = morgan(format, {
+    skip: () => false,
+    // skip: (req, res) => res.statusCode < 400,
   });
-
 } else {
   // In development, write logs to file
   const logDirectory = path.join(__dirname, "../logs");
@@ -23,9 +30,10 @@ if (process.env.NODE_ENV === "production") {
     { flags: "a" }
   );
 
-  requestLogger = morgan("combined", {
+  requestLogger = morgan(format, {
     stream: accessLogStream,
-    skip: (req, res) => res.statusCode < 400,
+    skip: () => false,
+    // skip: (req, res) => res.statusCode < 400,
   });
 }
 
