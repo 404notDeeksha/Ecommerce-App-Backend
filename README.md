@@ -15,7 +15,7 @@
 - **MongoDB Indexing** — Text search + compound indexes for fast product filtering
 - **Zod Validation** — Schema-based request validation with type coercion
 - **Serverless-Ready** — Vercel-compatible Express setup with preview deployment support
-- **Security Foundations** — Helmet headers, CORS, bcrypt password hashing, rate limiting
+- **Security Foundations** — Helmet headers, CORS, bcrypt password hashing, layered rate limiting
 
 ---
 
@@ -29,7 +29,7 @@
 | Auth | JWT (token gen/verify, rotation) |
 | Validation | Zod |
 | Security | Helmet, CORS, bcryptjs |
-| Rate Limiting | express-rate-limit |
+| Rate Limiting | express-rate-limit (layered per-endpoint) |
 | Logging | Morgan |
 | Deployment | Vercel (serverless) |
 
@@ -334,7 +334,7 @@ RATE_LIMIT_MAX_REQUESTS=100
 - [x] JWT token generation & verification
 - [x] Refresh token rotation with expiry tracking
 - [x] MongoDB indexing for product search
-- [x] Global rate limiting on API
+- [x] Layered rate limiting (global + auth + password brute-force protection)
 - [ ] Connect auth middleware to protected routes
 - [ ] Order management system
 - [ ] Payment integration (Stripe)
