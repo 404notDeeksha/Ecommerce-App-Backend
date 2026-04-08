@@ -40,10 +40,12 @@
 | Route | Methods |
 |-------|---------|
 | `/api/user` | POST signup, emailAuth, passwordAuth, logout |
-| `/api/products` | GET list, GET by ID |
+| `/api/products` | GET list, GET by ID, POST create*, PUT update*, DELETE delete* |
 | `/api/cart` | POST, GET, PUT, DELETE, GET quantity |
 | `/api/auth` | POST refresh-token |
 | `/api/carousel` | GET featured |
+
+*Requires authentication + appropriate role permission
 
 ### Products Filters
 | Filter | Query Param | Example |
@@ -57,6 +59,22 @@
 | Rating | `rating` | `?rating=4` (min stars) |
 | Sort | `sortBy`, `sortOrder` | `?sortBy=price&sortOrder=asc` |
 | Pagination | `page`, `limit` | `?page=2&limit=20` |
+
+### Admin Product Endpoints (RBAC Protected)
+| Method | Endpoint | Permission Required | Roles |
+|--------|----------|---------------------|-------|
+| GET | `/api/products` | `product:read` | All (user, product_manager, admin) |
+| GET | `/api/products/:id` | `product:read` | All |
+| POST | `/api/products` | `product:create` | admin, product_manager |
+| PUT | `/api/products/:id` | `product:update` | admin, product_manager |
+| DELETE | `/api/products/:id` | `product:delete` | admin only |
+
+**Authentication:** All protected endpoints require `Authorization: Bearer <token>` header.
+
+**Roles:**
+- `admin` — Full access (create, read, update, delete products)
+- `product_manager` — Create, read, update (no delete)
+- `user` — Read only
 
 ### Cart Endpoints
 | Method | Endpoint | Description |
@@ -76,6 +94,7 @@
 - **Fail-Fast Config** — Missing env vars crash at startup, not at runtime
 - **Password Safety** — `select: false` by default; explicit fetch only where needed
 - **Layered Rate Limiting** — Global (100/15min) + Auth (5/15min) + Password brute-force (3/15min)
+- **RBAC Middleware** — Permission-based access control with roles: admin, product_manager, user
 
 ---
 
@@ -252,26 +271,30 @@ const isVercelPreview = (origin) =>
 ├── services/                    Business logic
 │   ├── auth.service.js          Token generation & verification
 │   ├── user.service.js          User operations
-│   ├── products.service.js      Product queries
+│   ├── products.service.js      Product CRUD operations
 │   └── cart.service.js          Cart management
 │
 ├── routes/                      API definitions
 ├── validations/                 Zod schemas
 ├── middlewares/                  Express middleware
-│   ├── auth.middleware.js       JWT verification (ready to apply)
-│   ├── admin.middleware.js      Role check (ready to apply)
+│   ├── auth.middleware.js       JWT verification
+│   ├── admin.middleware.js      Coarse role check (admin only)
+│   ├── rbac.middleware.js       RBAC permission checker (new)
 │   ├── errorHandler.js          Centralized errors
 │   ├── validateRequest.js        Zod validation
 │   └── requestLogger.js         Morgan logging
 │
 ├── models/                      Mongoose schemas
-│   ├── User.model.js            (with refresh tokens)
-│   ├── Products.model.js         (with indexes)
+│   ├── User.model.js            (with refresh tokens & role)
+│   ├── Products.model.js         (with indexes & audit fields)
 │   ├── Cart.model.js            (with auto-pricing)
 │   └── Carousel.model.js
 │
 ├── utils/
 │   └── asyncHandler.js          Async wrapper
+│
+├── tests/                       Test suite
+│   └── rbac.test.js             RBAC middleware tests (new)
 │
 ├── data/                        Seed data (JSON)
 ├── server.js                    Express setup
@@ -317,6 +340,12 @@ RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
 ```
 
+### Run Tests
+
+```bash
+npm test
+```
+
 ### API Response Format
 
 **Success:**
@@ -358,7 +387,7 @@ RATE_LIMIT_MAX_REQUESTS=100
 - [x] Refresh token rotation with expiry tracking
 - [x] MongoDB indexing for product search
 - [x] Layered rate limiting (global + auth + password brute-force protection)
-- [ ] Connect auth middleware to protected routes
+- [x] RBAC middleware for product admin operations
 - [ ] Order management system
 - [ ] Payment integration (Stripe)
 - [ ] Product reviews & ratings
