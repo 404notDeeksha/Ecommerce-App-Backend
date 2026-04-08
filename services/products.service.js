@@ -1,4 +1,5 @@
 const Products = require("../models/Products.model");
+const { v4: uuidv4 } = require("uuid");
 
 const buildProductQuery = (filters) => {
   const query = {};
@@ -92,7 +93,37 @@ const getProductById = async (productId) => {
   return await Products.findOne({ productId }).lean();
 };
 
+const createProduct = async (productData, userId) => {
+  const product = new Products({
+    ...productData,
+    productId: uuidv4(),
+    createdBy: userId,
+    updatedBy: userId,
+  });
+  return await product.save();
+};
+
+const updateProduct = async (productId, productData, userId) => {
+  const product = await Products.findOneAndUpdate(
+    { productId },
+    {
+      ...productData,
+      updatedBy: userId,
+    },
+    { new: true, runValidators: true }
+  );
+  return product;
+};
+
+const deleteProduct = async (productId) => {
+  const product = await Products.findOneAndDelete({ productId });
+  return product;
+};
+
 module.exports = {
   getAllProducts,
   getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
 };
