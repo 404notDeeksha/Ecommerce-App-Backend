@@ -31,6 +31,7 @@
 | Security | Helmet, CORS, bcryptjs |
 | Rate Limiting | express-rate-limit (layered per-endpoint) |
 | Logging | Morgan |
+| Testing | Jest |
 | Deployment | Vercel (serverless) |
 
 ---
@@ -41,9 +42,10 @@
 |-------|---------|
 | `/api/user` | POST signup, emailAuth, passwordAuth, logout |
 | `/api/products` | GET list, GET by ID, POST create*, PUT update*, DELETE delete* |
+| `/api/products/product/:id` | GET single product by ID |
 | `/api/cart` | POST, GET, PUT, DELETE, GET quantity |
 | `/api/auth` | POST refresh-token |
-| `/api/carousel` | GET featured |
+| `/api/carousel/featured` | GET featured carousel items |
 
 *Requires authentication + appropriate role permission
 
@@ -63,8 +65,7 @@
 ### Admin Product Endpoints (RBAC Protected)
 | Method | Endpoint | Permission Required | Roles |
 |--------|----------|---------------------|-------|
-| GET | `/api/products` | `product:read` | All (user, product_manager, admin) |
-| GET | `/api/products/:id` | `product:read` | All |
+| GET | `/api/products/product/:id` | `product:read` | All |
 | POST | `/api/products` | `product:create` | admin, product_manager |
 | PUT | `/api/products/:id` | `product:update` | admin, product_manager |
 | DELETE | `/api/products/:id` | `product:delete` | admin only |
@@ -76,7 +77,7 @@
 - `product_manager` — Create, read, update (no delete)
 - `user` — Read only
 
-### Cart Endpoints
+### Cart Endpoints (Auth Required)
 | Method | Endpoint | Description |
 |--------|----------|--------------|
 | POST | `/api/cart` | Add items to cart |
@@ -85,11 +86,13 @@
 | PUT | `/api/cart/:userId/:productId/:quantity` | Update item qty |
 | DELETE | `/api/cart/:userId/:productId` | Remove item |
 
+> **Note:** All cart endpoints require authentication via `Authorization: Bearer <token>` header.
+
 ---
 
 ## 🧠 Engineering Highlights
 
-- **Token Rotation** — Refresh tokens stored in DB with expiry; old tokens invalidated on use
+- **Token Rotation** — Refresh tokens stored in DB with 7-day expiry; old tokens invalidated on use
 - **Auto-Priced Carts** — `pre("save")` middleware keeps totals consistent without manual updates
 - **Fail-Fast Config** — Missing env vars crash at startup, not at runtime
 - **Password Safety** — `select: false` by default; explicit fetch only where needed
@@ -102,6 +105,7 @@
 
 - Text search index across product name, description, brand, category
 - Compound indexes on (category, subCategory, price, rating) for filtered queries
+- Audit fields (`createdBy`, `updatedBy`) track product ownership changes
 - Pagination with configurable limits (max 100 per page)
 - Query builder pattern for dynamic filter construction
 
@@ -279,24 +283,25 @@ const isVercelPreview = (origin) =>
 ├── middlewares/                  Express middleware
 │   ├── auth.middleware.js       JWT verification
 │   ├── admin.middleware.js      Coarse role check (admin only)
-│   ├── rbac.middleware.js       RBAC permission checker (new)
+│   ├── rbac.middleware.js       RBAC permission checker
 │   ├── errorHandler.js          Centralized errors
 │   ├── validateRequest.js        Zod validation
 │   └── requestLogger.js         Morgan logging
 │
 ├── models/                      Mongoose schemas
 │   ├── User.model.js            (with refresh tokens & role)
-│   ├── Products.model.js         (with indexes & audit fields)
+│   ├── Products.model.js        (with indexes & audit fields: createdBy, updatedBy)
 │   ├── Cart.model.js            (with auto-pricing)
-│   └── Carousel.model.js
+│   └── Carousel.model.js        (category_id, display_type, category_image_address)
 │
 ├── utils/
 │   └── asyncHandler.js          Async wrapper
 │
 ├── tests/                       Test suite
-│   └── rbac.test.js             RBAC middleware tests (new)
+│   └── rbac.test.js             RBAC middleware tests
 │
 ├── data/                        Seed data (JSON)
+├── jest.config.js               Jest configuration
 ├── server.js                    Express setup
 └── main.js                      Entry point
 ```
@@ -328,7 +333,7 @@ npm run dev
 ### Environment Variables
 
 ```bash
-PORT=8000
+PORT=8001
 MONGODB_URL=mongodb+srv://<user>:<pass>@cluster.mongodb.net/ecommerce
 DEP_FRONTEND_URL=https://your-frontend.vercel.app
 DEV_FRONTEND_URL=http://localhost:5173
@@ -338,13 +343,18 @@ ACCESS_TOKEN_EXPIRY=15m
 REFRESH_TOKEN_EXPIRY=7d
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
+AUTH_RATE_LIMIT_MAX=5
 ```
 
 ### Run Tests
 
 ```bash
-npm test
+npm test           # Run all tests
+npm run test:watch # Watch mode
+npm run test:coverage # With coverage report
 ```
+
+> Jest auto-discovers all `*.test.js` files in the `tests/` directory.
 
 ### API Response Format
 
@@ -388,6 +398,7 @@ npm test
 - [x] MongoDB indexing for product search
 - [x] Layered rate limiting (global + auth + password brute-force protection)
 - [x] RBAC middleware for product admin operations
+- [x] Cart endpoint security (auth-protected)
 - [ ] Order management system
 - [ ] Payment integration (Stripe)
 - [ ] Product reviews & ratings
@@ -398,4 +409,4 @@ npm test
 
 ## 📄 License
 
-MIT — [LICENSE](https://github.com/404notDeeksha/Ecommerce-App-Backend/blob/main/License)
+ISC — [LICENSE](https://github.com/404notDeeksha/Ecommerce-App-Backend/blob/main/License)
