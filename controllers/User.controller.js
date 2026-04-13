@@ -18,6 +18,7 @@ const signupUser = asyncHandler(async (req, res) => {
     user.userId,
     user.role
   );
+  
   await authService.storeRefreshToken(user.userId, refreshToken);
 
   res.status(201).json({

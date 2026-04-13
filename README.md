@@ -81,12 +81,12 @@
 | Method | Endpoint | Description |
 |--------|----------|--------------|
 | POST | `/api/cart` | Add items to cart |
-| GET | `/api/cart/:userId` | Get user's cart |
-| GET | `/api/cart/quantity/:userId` | Get cart item count |
-| PUT | `/api/cart/:userId/:productId/:quantity` | Update item qty |
-| DELETE | `/api/cart/:userId/:productId` | Remove item |
+| GET | `/api/cart` | Get user's cart |
+| GET | `/api/cart/quantity` | Get cart item count |
+| PUT | `/api/cart/:productId/:quantity` | Update item qty |
+| DELETE | `/api/cart/:productId` | Remove item |
 
-> **Note:** All cart endpoints require authentication via `Authorization: Bearer <token>` header.
+> **Note:** All cart endpoints require authentication. User ID is derived from JWT token — no userId needed in request.
 
 ---
 
