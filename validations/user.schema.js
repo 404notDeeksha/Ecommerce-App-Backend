@@ -21,8 +21,15 @@ const passwordAuthSchema = z.object({
   }),
 });
 
+const refreshTokenSchema = z.object({
+  body: z.object({
+    refreshToken: z.string().min(1, "Refresh token is required"),
+  }),
+});
+
 module.exports = {
   signupSchema,
   emailAuthSchema,
   passwordAuthSchema,
+  refreshTokenSchema,
 };
