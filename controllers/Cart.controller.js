@@ -2,7 +2,8 @@ const cartService = require("../services/cart.service");
 const asyncHandler = require("../utils/asyncHandler");
 
 const addCartItems = asyncHandler(async (req, res) => {
-  const { userId, items } = req.body;
+  const userId = req.user.userId;
+  const { items } = req.body;
 
   const cart = await cartService.addItemsToCart(userId, items);
   res.status(200).json({
@@ -13,13 +14,10 @@ const addCartItems = asyncHandler(async (req, res) => {
 });
 
 const updateCartQty = asyncHandler(async (req, res) => {
-  const { userId, productId, quantity } = req.params;
+  const userId = req.user.userId;
+  const { productId, quantity } = req.params;
 
-  const result = await cartService.updateCartItemQuantity(
-    userId,
-    productId,
-    quantity
-  );
+  const result = await cartService.updateCartItemQuantity(userId, productId, quantity);
 
   if (result.error) {
     return res.status(404).json({ error: result.error });
@@ -33,7 +31,7 @@ const updateCartQty = asyncHandler(async (req, res) => {
 });
 
 const getCart = asyncHandler(async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user.userId;
 
   let cart = await cartService.getCartByUserId(userId);
 
@@ -45,7 +43,7 @@ const getCart = asyncHandler(async (req, res) => {
 });
 
 const getCartQty = asyncHandler(async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user.userId;
 
   const totalQuantity = await cartService.calculateCartQuantity(userId);
 
@@ -53,7 +51,8 @@ const getCartQty = asyncHandler(async (req, res) => {
 });
 
 const deleteCartItem = asyncHandler(async (req, res) => {
-  const { userId, productId } = req.params;
+  const userId = req.user.userId;
+  const { productId } = req.params;
 
   const result = await cartService.removeCartItem(userId, productId);
 
