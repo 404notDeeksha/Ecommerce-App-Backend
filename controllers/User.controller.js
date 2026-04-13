@@ -18,7 +18,7 @@ const signupUser = asyncHandler(async (req, res) => {
     user.userId,
     user.role
   );
-  
+
   await authService.storeRefreshToken(user.userId, refreshToken);
 
   res.status(201).json({
@@ -37,7 +37,6 @@ const signupUser = asyncHandler(async (req, res) => {
 
 const verifyEmail = asyncHandler(async (req, res) => {
   const { email } = req.body;
-  console.log("Email input", email);
 
   const user = await userService.findUserByEmail(email);
 
@@ -101,7 +100,7 @@ const verifyPassword = asyncHandler(async (req, res) => {
 
 const logoutUser = asyncHandler(async (req, res) => {
   const { refreshToken } = req.body;
-  
+
   if (refreshToken) {
     try {
       const decoded = authService.verifyRefreshToken(refreshToken);
