@@ -77,6 +77,30 @@ const generateNewAccessToken = async (refreshToken) => {
   return { accessToken, role: user.role };
 };
 
+const rotateRefreshToken = async (refreshToken) => {
+  const user = await findUserByRefreshToken(refreshToken);
+
+  if (!user) {
+    return null;
+  }
+
+  await removeRefreshToken(user.userId, refreshToken);
+
+  const { accessToken, refreshToken: newRefreshToken } = generateTokens(
+    user.userId,
+    user.role
+  );
+
+  await storeRefreshToken(user.userId, newRefreshToken);
+
+  return {
+    userId: user.userId,
+    role: user.role,
+    accessToken,
+    refreshToken: newRefreshToken,
+  };
+};
+
 module.exports = {
   generateTokens,
   verifyAccessToken,
@@ -86,4 +110,5 @@ module.exports = {
   removeAllRefreshTokens,
   findUserByRefreshToken,
   generateNewAccessToken,
+  rotateRefreshToken,
 };
