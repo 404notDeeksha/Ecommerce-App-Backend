@@ -15,7 +15,6 @@ if (process.env.NODE_ENV === "production") {
   // In production, log to console (platform captures logs)
   requestLogger = morgan(format, {
     skip: () => false,
-    // skip: (req, res) => res.statusCode < 400,
   });
 } else {
   // In development, write logs to file
@@ -33,7 +32,6 @@ if (process.env.NODE_ENV === "production") {
   requestLogger = morgan(format, {
     stream: accessLogStream,
     skip: () => false,
-    // skip: (req, res) => res.statusCode < 400,
   });
 }
 
