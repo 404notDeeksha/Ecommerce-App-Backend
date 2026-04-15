@@ -3,17 +3,13 @@ const jwtConfig = require("../config/jwt");
 const User = require("../models/User.model");
 
 const generateTokens = (userId, role) => {
-  const accessToken = jwt.sign(
-    { userId, role },
-    jwtConfig.accessTokenSecret,
-    { expiresIn: jwtConfig.accessTokenExpiry }
-  );
+  const accessToken = jwt.sign({ userId, role }, jwtConfig.accessTokenSecret, {
+    expiresIn: jwtConfig.accessTokenExpiry,
+  });
 
-  const refreshToken = jwt.sign(
-    { userId },
-    jwtConfig.refreshTokenSecret,
-    { expiresIn: jwtConfig.refreshTokenExpiry }
-  );
+  const refreshToken = jwt.sign({ userId }, jwtConfig.refreshTokenSecret, {
+    expiresIn: jwtConfig.refreshTokenExpiry,
+  });
 
   return { accessToken, refreshToken };
 };
@@ -33,9 +29,14 @@ const storeRefreshToken = async (userId, refreshToken) => {
   await User.updateOne(
     { userId },
     {
+      $pull: {
+        refreshTokens: {
+          expiresAt: { $lt: new Date() },
+        },
+      },
       $push: {
-        refreshTokens: { token: refreshToken, expiresAt }
-      }
+        refreshTokens: { token: refreshToken, expiresAt },
+      },
     },
     { upsert: true }
   );
@@ -49,16 +50,13 @@ const removeRefreshToken = async (userId, refreshToken) => {
 };
 
 const removeAllRefreshTokens = async (userId) => {
-  await User.updateOne(
-    { userId },
-    { $set: { refreshTokens: [] } }
-  );
+  await User.updateOne({ userId }, { $set: { refreshTokens: [] } });
 };
 
 const findUserByRefreshToken = async (refreshToken) => {
   const user = await User.findOne({
     "refreshTokens.token": refreshToken,
-    "refreshTokens.expiresAt": { $gt: new Date() }
+    "refreshTokens.expiresAt": { $gt: new Date() },
   });
 
   return user;
