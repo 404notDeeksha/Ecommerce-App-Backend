@@ -1,20 +1,19 @@
 const mongoose = require("mongoose");
 
-// update keys to camelCase in be & fe
 const carouselSchema = new mongoose.Schema(
   {
-    category_id: {
+    categoryId: {
       type: String,
       required: true,
       unique: true,
       trim: true,
     },
-    display_type: {
+    displayType: {
       type: String,
       required: true,
       trim: true,
     },
-    category_image_address: {
+    categoryImageAddress: {
       type: String,
       required: true,
     },
