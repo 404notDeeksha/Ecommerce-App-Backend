@@ -29,11 +29,6 @@ const storeRefreshToken = async (userId, refreshToken) => {
   await User.updateOne(
     { userId },
     {
-      $pull: {
-        refreshTokens: {
-          expiresAt: { $lt: new Date() },
-        },
-      },
       $push: {
         refreshTokens: { token: refreshToken, expiresAt },
       },
