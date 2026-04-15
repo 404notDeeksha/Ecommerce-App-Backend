@@ -1,7 +1,7 @@
 const express = require("express");
 const { getCarousel } = require("../controllers/Carousel.controller");
-const router = express.Router();
+const carouselRouter = express.Router();
 
-router.get("/featured", getCarousel);
+carouselRouter.get("/featured", getCarousel);
 
-module.exports = router;
+module.exports = carouselRouter;
