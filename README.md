@@ -2,7 +2,7 @@
 
 > RESTful API powering an Amazon-inspired e-commerce platform — built with production patterns in mind.
 
-[![MIT](https://img.shields.io/github/license/404notDeeksha/Ecommerce-App-Backend?style=flat-square)](https://github.com/404notDeeksha/Ecommerce-App-Backend/blob/main/License) · [![Node.js](https://img.shields.io/badge/Node.js-18+-green)](https://nodejs.org) · [![Express](https://img.shields.io/badge/Express.js-Backend-black)](https://expressjs.com) · [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)](https://www.mongodb.com/atlas) · [![Vercel](https://img.shields.io/badge/Deployed-Vercel-black)](https://vercel.com)
+[![MIT](https://img.shields.io/github/license/404notDeeksha/Ecommerce-App-Backend?style=flat-square)](https://github.com/404notDeeksha/Ecommerce-App-Backend/blob/main/License) · [![Node.js](https://img.shields.io/badge/Node.js-18+-green)](https://nodejs.org) · [![Express](https://img.shields.io/badge/Express.js-Backend-black)](https://expressjs.com) · [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green)](https://www.mongodb.com/atlas) · [![Vercel](https://img.shields.io/badge/Deployed-Vercel-black)](https://vercel.com) · [![Coverage](https://img.shields.io/badge/Coverage-86%25-brightgreen)](https://github.com/404notDeeksha/Ecommerce-App-Backend)
 
 **[🌐 Live Demo](https://ecommerce-app-techwithdeekksha.vercel.app)** · **[Frontend Repo](https://github.com/404notDeeksha/Ecommerce-App)**
 
@@ -10,403 +10,128 @@
 
 ## 🎯 Key Highlights
 
-- **JWT Ready** — Token generation, verification & rotation implemented; middleware wired on frontend
-- **Layered Architecture** — Clean separation: Routes → Validation → Controllers → Services → Models
-- **MongoDB Indexing** — Text search + compound indexes for fast product filtering
+- **JWT Auth** — Dual-token system (access 15m + refresh 7d) with rotation & DB storage
+- **Layered Rate Limiting** — Global (100/15m), auth (5/15m), password brute-force (3/15m), refresh (30/15m)
+- **RBAC** — Permission-based access: admin, product_manager, user
+- **MongoDB Indexing** — 8 indexes (1 text + 7 single-field) for filtered product queries
 - **Zod Validation** — Schema-based request validation with type coercion
-- **Serverless-Ready** — Vercel-compatible Express setup with preview deployment support
-- **Security Foundations** — Helmet headers, CORS, bcrypt password hashing, layered rate limiting
-
----
+- **86% Test Coverage** — 117 tests with MongoDB Memory Server; services & core middleware at 100%
+- **Serverless-Ready** — Vercel-compatible Express setup
 
 ## ⚙️ Tech Stack
 
 | Layer | Technology |
 |-------|------------|
-| Runtime | Node.js 18+ |
-| Framework | Express.js |
+| Runtime | Node.js 18+ · Express.js |
 | Database | MongoDB Atlas + Mongoose |
-| Auth | JWT (token gen/verify, rotation) |
+| Auth | JWT (rotation + refresh tokens in DB) |
 | Validation | Zod |
-| Security | Helmet, CORS, bcryptjs |
-| Rate Limiting | express-rate-limit (layered per-endpoint) |
-| Logging | Morgan |
-| Testing | Jest |
+| Security | Helmet, CORS, bcryptjs, 4-layer rate limiting |
+| Testing | Jest + MongoDB Memory Server |
 | Deployment | Vercel (serverless) |
-
----
 
 ## 📡 API Surface
 
-| Route | Methods |
-|-------|---------|
-| `/api/user` | POST signup, emailAuth, passwordAuth, logout |
-| `/api/products` | GET list, GET by ID, POST create*, PUT update*, DELETE delete* |
-| `/api/products/product/:id` | GET single product by ID |
-| `/api/cart` | POST, GET, PUT, DELETE, GET quantity |
-| `/api/auth` | POST refresh-token |
-| `/api/carousel/featured` | GET featured carousel items |
+| Route | Methods | Auth |
+|-------|---------|------|
+| `/api/user` | POST signup, emailAuth, passwordAuth, logout | — |
+| `/api/auth/refresh-token` | POST | — |
+| `/api/products` | GET list (+ filters), POST create | create* |
+| `/api/products/product/:id` | GET | — |
+| `/api/products/:id` | PUT update*, DELETE delete* | update* / delete* |
+| `/api/cart` | POST, GET, PUT, DELETE | JWT |
+| `/api/cart/quantity` | GET | JWT |
+| `/api/carousel/featured` | GET | — |
 
-*Requires authentication + appropriate role permission
+### Product Filters
+`?search=` · `?category=` · `?subCategory=` · `?minPrice=` · `?maxPrice=` · `?brand=` · `?discount=` · `?rating=` · `?sortBy=` · `?page=` · `?limit=`
 
-### Products Filters
-| Filter | Query Param | Example |
-|--------|-------------|----------|
-| Text search | `search` | `?search=phone` |
-| Category | `category` | `?category=Electronics` |
-| Subcategory | `subCategory` | `?subCategory=Mobiles` |
-| Price range | `minPrice`, `maxPrice` | `?minPrice=100&maxPrice=500` |
-| Brand | `brand` | `?brand=Apple,Samsung` |
-| Discount | `discount` | `?discount=50` (max %) |
-| Rating | `rating` | `?rating=4` (min stars) |
-| Sort | `sortBy`, `sortOrder` | `?sortBy=price&sortOrder=asc` |
-| Pagination | `page`, `limit` | `?page=2&limit=20` |
+### RBAC Roles
+| Role | Permissions |
+|------|-------------|
+| `admin` | create, read, update, delete |
+| `product_manager` | create, read, update |
+| `user` | read only |
 
-### Admin Product Endpoints (RBAC Protected)
-| Method | Endpoint | Permission Required | Roles |
-|--------|----------|---------------------|-------|
-| GET | `/api/products/product/:id` | `product:read` | All |
-| POST | `/api/products` | `product:create` | admin, product_manager |
-| PUT | `/api/products/:id` | `product:update` | admin, product_manager |
-| DELETE | `/api/products/:id` | `product:delete` | admin only |
+## 🧠 Engineering Decisions
 
-**Authentication:** All protected endpoints require `Authorization: Bearer <token>` header.
+- **Token rotation** — old refresh token invalidated on each `/refresh-token` call
+- **Auto-priced carts** — `pre("save")` hook recalculates `totalPrice` from items
+- **Fail-fast config** — missing env vars crash at startup via `envValidator.js`
+- **Password safety** — `select: false` by default; explicit `.select("+password")` only for auth
+- **Cart quantity aggregation** — MongoDB `$unwind` + `$group` avoids loading full cart
+- **CORS for Vercel previews** — regex allowlist for `*.vercel.app` preview URLs
+- **Async error handling** — `asyncHandler` wrapper forwards rejections to centralized error middleware
+- **Query builder pattern** — dynamic MongoDB query construction from optional filters
 
-**Roles:**
-- `admin` — Full access (create, read, update, delete products)
-- `product_manager` — Create, read, update (no delete)
-- `user` — Read only
+## 📊 Metrics
 
-### Cart Endpoints (Auth Required)
-| Method | Endpoint | Description |
-|--------|----------|--------------|
-| POST | `/api/cart` | Add items to cart |
-| GET | `/api/cart` | Get user's cart |
-| GET | `/api/cart/quantity` | Get cart item count |
-| PUT | `/api/cart/:productId/:quantity` | Update item qty |
-| DELETE | `/api/cart/:productId` | Remove item |
+| Metric | Value | Verify |
+|--------|-------|--------|
+| Test coverage | 86% (117 tests) | `npm run test:coverage` |
+| Service layer | 100% | Coverage report |
+| Auth/RBAC middleware | 100% | Coverage report |
+| Rate limiter layers | 4 | `config/rateLimit.js` |
+| MongoDB indexes | 8 | `Products.model.js` |
 
-> **Note:** All cart endpoints require authentication. User ID is derived from JWT token — no userId needed in request.
-
----
-
-## 🧠 Engineering Highlights
-
-- **Token Rotation** — Refresh tokens stored in DB with 7-day expiry; old tokens invalidated on use
-- **Auto-Priced Carts** — `pre("save")` middleware keeps totals consistent without manual updates
-- **Fail-Fast Config** — Missing env vars crash at startup, not at runtime
-- **Password Safety** — `select: false` by default; explicit fetch only where needed
-- **Layered Rate Limiting** — Global (100/15min) + Auth (5/15min) + Password brute-force (3/15min)
-- **RBAC Middleware** — Permission-based access control with roles: admin, product_manager, user
-
----
-
-## 📊 Performance & Query Optimization
-
-- Text search index across product name, description, brand, category
-- Compound indexes on (category, subCategory, price, rating) for filtered queries
-- Audit fields (`createdBy`, `updatedBy`) track product ownership changes
-- Pagination with configurable limits (max 100 per page)
-- Query builder pattern for dynamic filter construction
-
----
-
-<hr>
+**Query perf check:**
+```js
+db.products.find({ category: "Electronics" }).explain("executionStats")
+// totalKeysExamined ≈ totalDocsExamined = index hit (no COLLSCAN)
+```
 
 <details>
-<summary><strong>🔍 Expand: Detailed Engineering Decisions</strong></summary>
+<summary><strong>📁 Project Structure</strong></summary>
 
-### 1. JWT Token Generation & Verification
-
-Dual-token system generates both access and refresh tokens on signup/login:
-
-```javascript
-// Access token (15 min) — used in Authorization header
-// Refresh token (7 days) — stored in DB with expiry timestamp
 ```
-
-Token rotation invalidates old refresh tokens on each refresh call.
-
----
-
-### 2. Refresh Token Storage with Expiry Tracking
-
-```javascript
-refreshTokens: [{ token: String, expiresAt: Date }]
+├── config/          envValidator, jwt, rateLimit, dbConnection, corsOptions
+├── controllers/     User, Products, Cart, Carousel
+├── services/        auth (token gen/rotate), user, products (query builder), cart
+├── middlewares/     auth, rbac, errorHandler, validateRequest, requestLogger
+├── models/          User (refreshTokens), Products (8 indexes), Cart (pre-save hook), Carousel
+├── validations/     Zod schemas (user, products, cart)
+├── routes/          Express route definitions
+├── utils/           asyncHandler, isAllowedOrigin
+├── tests/           11 test files, 117 tests (setup.js, testEnv.js)
+└── main.js          Entry point (dev server + Vercel export)
 ```
-
-Tokens validated against both existence and expiry before issuing new access token.
-
----
-
-### 3. Cart Total Auto-Calculation
-
-Mongoose `pre("save")` hook ensures totals stay consistent:
-
-```javascript
-cartSchema.pre("save", function (next) {
-  this.totalPrice = this.items.reduce(
-    (total, item) => total + item.quantity * item.price, 0
-  );
-  next();
-});
-```
-
----
-
-### 4. Query Param Type Coercion
-
-Query strings arrive as strings. Zod transformers handle conversion:
-
-```javascript
-minPrice: z.string()
-  .or(z.number())
-  .transform((val) => (val === "" ? undefined : Number(val)))
-```
-
----
-
-### 5. Vercel Serverless Compatibility
-
-```javascript
-// main.js — HTTP server only in dev
-if (process.env.NODE_ENV !== "production") {
-  app.listen(port, ...);
-}
-
-// server.js — exports for Vercel Lambda
-module.exports = app;
-```
-
----
-
-### 6. Password Exclusion by Default
-
-```javascript
-password: { type: String, select: false }
-// Explicitly fetch when needed:
-User.findOne({ email }).select("+password")
-```
-
 </details>
 
----
-
-<hr>
-
 <details>
-<summary><strong>⚠️ Expand: Challenges & Solutions</strong></summary>
-
-### Async Errors Without Try-Catch
-
-**Problem:** Unhandled promise rejections crash the server.
-
-**Solution:** Lightweight wrapper:
-
-```javascript
-const asyncHandler = (fn) => (req, res, next) =>
-  Promise.resolve(fn(req, res, next)).catch(next);
-```
-
----
-
-### Cart Quantity Without Full Fetch
-
-**Problem:** UI needs item count; fetching entire cart is expensive.
-
-**Solution:** Dedicated endpoint with aggregation:
-
-```javascript
-calculateCartQuantity = async (userId) => {
-  const cart = await Cart.findOne({ userId });
-  return cart?.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0;
-};
-```
-
----
-
-### Dynamic Product Filter Queries
-
-**Problem:** Multiple optional filters (category, price, brand, etc.) with AND logic.
-
-**Solution:** Query builder in service layer:
-
-```javascript
-if (filters.search) query.$text = { $search: filters.search };
-if (filters.category) query.category = filters.category;
-if (filters.brand) query.brand = { $in: filters.brand.split(",") };
-```
-
----
-
-### CORS for Vercel Preview URLs
-
-**Problem:** CORS blocks Vercel's random preview URLs during dev.
-
-**Solution:** Regex allowlist for preview deployments:
-
-```javascript
-const isVercelPreview = (origin) =>
-  /^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(origin || "");
-```
-
-</details>
-
----
-
-<hr>
-
-<details>
-<summary><strong>📁 Expand: Project Structure</strong></summary>
-
-```
-├── config/                       Configuration layer
-│   ├── dbConnection.js           MongoDB connection
-│   ├── envValidator.js           Env validation (fail-fast)
-│   ├── jwt.js                    JWT secrets & expiry
-│   └── rateLimit.js             Rate limiter configs
-│
-├── controllers/                  Request handlers
-│   ├── User.controller.js
-│   ├── Products.controller.js
-│   ├── Cart.controller.js
-│   └── Carousel.controller.js
-│
-├── services/                    Business logic
-│   ├── auth.service.js          Token generation & verification
-│   ├── user.service.js          User operations
-│   ├── products.service.js      Product CRUD operations
-│   └── cart.service.js          Cart management
-│
-├── routes/                      API definitions
-├── validations/                 Zod schemas
-├── middlewares/                  Express middleware
-│   ├── auth.middleware.js       JWT verification
-│   ├── admin.middleware.js      Coarse role check (admin only)
-│   ├── rbac.middleware.js       RBAC permission checker
-│   ├── errorHandler.js          Centralized errors
-│   ├── validateRequest.js        Zod validation
-│   └── requestLogger.js         Morgan logging
-│
-├── models/                      Mongoose schemas
-│   ├── User.model.js            (with refresh tokens & role)
-│   ├── Products.model.js        (with indexes & audit fields: createdBy, updatedBy)
-│   ├── Cart.model.js            (with auto-pricing)
-│   └── Carousel.model.js        (category_id, display_type, category_image_address)
-│
-├── utils/
-│   └── asyncHandler.js          Async wrapper
-│
-├── tests/                       Test suite
-│   └── rbac.test.js             RBAC middleware tests
-│
-├── data/                        Seed data (JSON)
-├── jest.config.js               Jest configuration
-├── server.js                    Express setup
-└── main.js                      Entry point
-```
-
-</details>
-
----
-
-<hr>
-
-<details>
-<summary><strong>🚀 Expand: Setup & Environment</strong></summary>
-
-### Prerequisites
-- Node.js 18+
-- MongoDB Atlas (or local MongoDB)
-
-### Quick Start
+<summary><strong>🚀 Setup</strong></summary>
 
 ```bash
 git clone git@github.com:404notDeeksha/Ecommerce-App-Backend.git
-cd Ecommerce-App-Backend
-npm install
-cp .env.example .env
-# Edit .env with MONGODB_URL and JWT secrets
+cd Ecommerce-App-Backend && npm install
+cp .env.example .env   # Edit MONGODB_URL + JWT secrets
 npm run dev
 ```
 
-### Environment Variables
+**Env variables:** `PORT`, `MONGODB_URL`, `DEP_FRONTEND_URL`, `DEV_FRONTEND_URL`, `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`, `ACCESS_TOKEN_EXPIRY`, `REFRESH_TOKEN_EXPIRY`, `RATE_LIMIT_WINDOW_MS`, `RATE_LIMIT_MAX_REQUESTS`, `AUTH_RATE_LIMIT_MAX`
 
+**Tests** (uses in-memory MongoDB, no external DB needed):
 ```bash
-PORT=8001
-MONGODB_URL=mongodb+srv://<user>:<pass>@cluster.mongodb.net/ecommerce
-DEP_FRONTEND_URL=https://your-frontend.vercel.app
-DEV_FRONTEND_URL=http://localhost:5173
-ACCESS_TOKEN_SECRET=<32+ char random string>
-REFRESH_TOKEN_SECRET=<32+ char random string>
-ACCESS_TOKEN_EXPIRY=15m
-REFRESH_TOKEN_EXPIRY=7d
-RATE_LIMIT_WINDOW_MS=900000
-RATE_LIMIT_MAX_REQUESTS=100
-AUTH_RATE_LIMIT_MAX=5
+npm test              # 117 tests
+npm run test:coverage # 86% coverage report
 ```
 
-### Run Tests
-
-```bash
-npm test           # Run all tests
-npm run test:watch # Watch mode
-npm run test:coverage # With coverage report
-```
-
-> Jest auto-discovers all `*.test.js` files in the `tests/` directory.
-
-### API Response Format
-
-**Success:**
+**Response format:**
 ```json
-{
-  "success": true,
-  "message": "Operation description",
-  "data": { ... },
-  "pagination": { "total": 100, "page": 1, "totalPages": 5 }
-}
+// Success
+{ "success": true, "message": "...", "data": {...}, "pagination": { "total": 100, "page": 1, "totalPages": 5 } }
+// Error
+{ "success": false, "message": "...", "code": "TOKEN_EXPIRED" }
 ```
-
-**Auth (signup/login):**
-```json
-{
-  "success": true,
-  "data": { "id": "...", "name": "...", "role": "user" },
-  "accessToken": "eyJ...",
-  "refreshToken": "eyJ..."
-}
-```
-
-**Error:**
-```json
-{
-  "success": false,
-  "message": "Error description",
-  "code": "TOKEN_EXPIRED"
-}
-```
-
 </details>
-
----
 
 ## 📈 Roadmap
 
-- [x] JWT token generation & verification
-- [x] Refresh token rotation with expiry tracking
-- [x] MongoDB indexing for product search
-- [x] Layered rate limiting (global + auth + password brute-force protection)
-- [x] RBAC middleware for product admin operations
-- [x] Cart endpoint security (auth-protected)
-- [ ] Order management system
-- [ ] Payment integration (Stripe)
-- [ ] Product reviews & ratings
-- [ ] Wishlist functionality
-- [ ] API caching (Redis)
+- [x] JWT auth + token rotation
+- [x] MongoDB indexing + query builder
+- [x] Layered rate limiting + RBAC
+- [x] Test coverage (86%)
+- [ ] Order management · Stripe payments · Reviews · Wishlist · Redis caching
 
 ---
-
-## 📄 License
 
 ISC — [LICENSE](https://github.com/404notDeeksha/Ecommerce-App-Backend/blob/main/License)
