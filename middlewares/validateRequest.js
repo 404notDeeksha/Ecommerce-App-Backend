@@ -8,8 +8,9 @@ const validateRequest = (schema) => (req, res, next) => {
 
     next();
   } catch (error) {
-    const formattedErrors = error.errors.map((err) => ({
-      field: err.path.slice(1).join("."),
+    const issues = error.issues || error.errors || [];
+    const formattedErrors = issues.map((err) => ({
+      field: (err.path || []).join("."),
       message: err.message,
     }));
 

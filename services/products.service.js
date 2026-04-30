@@ -121,6 +121,8 @@ const deleteProduct = async (productId) => {
 };
 
 module.exports = {
+  buildProductQuery,
+  buildSortOption,
   getAllProducts,
   getProductById,
   createProduct,
