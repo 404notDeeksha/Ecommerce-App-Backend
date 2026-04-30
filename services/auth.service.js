@@ -14,14 +14,6 @@ const generateTokens = (userId, role) => {
   return { accessToken, refreshToken };
 };
 
-const verifyAccessToken = (token) => {
-  return jwt.verify(token, jwtConfig.accessTokenSecret);
-};
-
-const verifyRefreshToken = (token) => {
-  return jwt.verify(token, jwtConfig.refreshTokenSecret);
-};
-
 const storeRefreshToken = async (userId, refreshToken) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
@@ -37,15 +29,19 @@ const storeRefreshToken = async (userId, refreshToken) => {
   );
 };
 
+const verifyAccessToken = (token) => {
+  return jwt.verify(token, jwtConfig.accessTokenSecret);
+};
+
+const verifyRefreshToken = (token) => {
+  return jwt.verify(token, jwtConfig.refreshTokenSecret);
+};
+
 const removeRefreshToken = async (userId, refreshToken) => {
   await User.updateOne(
     { userId },
     { $pull: { refreshTokens: { token: refreshToken } } }
   );
-};
-
-const removeAllRefreshTokens = async (userId) => {
-  await User.updateOne({ userId }, { $set: { refreshTokens: [] } });
 };
 
 const findUserByRefreshToken = async (refreshToken) => {
@@ -55,19 +51,6 @@ const findUserByRefreshToken = async (refreshToken) => {
   });
 
   return user;
-};
-
-const generateNewAccessToken = async (refreshToken) => {
-  const decoded = verifyRefreshToken(refreshToken);
-  const user = await findUserByRefreshToken(refreshToken);
-
-  if (!user || user.userId !== decoded.userId) {
-    throw new Error("Invalid refresh token");
-  }
-
-  const { accessToken } = generateTokens(user.userId, user.role);
-
-  return { accessToken, role: user.role };
 };
 
 const rotateRefreshToken = async (refreshToken) => {
@@ -100,8 +83,6 @@ module.exports = {
   verifyRefreshToken,
   storeRefreshToken,
   removeRefreshToken,
-  removeAllRefreshTokens,
   findUserByRefreshToken,
-  generateNewAccessToken,
   rotateRefreshToken,
 };

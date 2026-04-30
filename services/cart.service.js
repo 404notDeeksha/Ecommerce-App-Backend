@@ -1,13 +1,5 @@
 const Cart = require("../models/Cart.model");
 
-const getCartByUserId = async (userId) => {
-  return Cart.findOne({ userId }).lean();
-};
-
-const createCart = async ({ userId, items = [] }) => {
-  return Cart.create({ userId, items, totalPrice: 0 });
-};
-
 const getOrCreateCart = async (userId) => {
   return Cart.findOneAndUpdate(
     { userId },
@@ -92,8 +84,6 @@ const calculateCartQuantity = async (userId) => {
 };
 
 module.exports = {
-  getCartByUserId,
-  createCart,
   getOrCreateCart,
   addItemsToCart,
   updateCartItemQuantity,
