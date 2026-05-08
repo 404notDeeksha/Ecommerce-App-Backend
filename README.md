@@ -8,6 +8,12 @@
 
 ---
 
+## 🏗️ Architecture
+
+![Architecture Diagram](docs/architecture/ECOM.drawio.png)
+
+---
+
 ## 🎯 Key Highlights
 
 - **JWT Auth** — Dual-token system (access 15m + refresh 7d) with rotation & DB storage
