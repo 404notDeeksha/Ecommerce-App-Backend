@@ -96,6 +96,13 @@ Benchmark Tool: Autocannon
 Load Profile:
 50 Concurrent Users
 20 Second Duration
+
+Results:
+- Average Response Time: 652 ms
+- Throughput: 73.7 Requests/Second
+- Success Rate: 100%
+- Error Rate: 0%
+
 <details>
 <summary><strong>📁 Project Structure</strong></summary>
 
