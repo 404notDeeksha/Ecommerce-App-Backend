@@ -86,6 +86,16 @@ db.products.find({ category: "Electronics" }).explain("executionStats")
 // totalKeysExamined ≈ totalDocsExamined = index hit (no COLLSCAN)
 ```
 
+## API Performance
+
+Endpoint Tested:
+GET /api/products
+
+Benchmark Tool: Autocannon
+
+Load Profile:
+50 Concurrent Users
+20 Second Duration
 <details>
 <summary><strong>📁 Project Structure</strong></summary>
 
