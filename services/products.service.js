@@ -74,7 +74,14 @@ const getAllProducts = async (filters) => {
   const sort = buildSortOption(filters.sortBy, filters.sortOrder);
 
   const [products, total] = await Promise.all([
-    Products.find(query).sort(sort).skip(skip).limit(limit).lean(),
+    Products.find(query)
+      .select(
+        "productId productName productDescription rating price brand colour images modelName warranty category material itemDimensions subCategory"
+      )
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .lean(),
     Products.countDocuments(query),
   ]);
 
