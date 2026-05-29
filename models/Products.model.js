@@ -52,6 +52,7 @@ productSchema.index({ brand: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ rating: -1 });
 productSchema.index({ discount: -1 });
+productSchema.index({ productName: 1 });
 
 const Product = mongoose.model("Product", productSchema);
 
